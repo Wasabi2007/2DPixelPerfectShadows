@@ -1,0 +1,39 @@
+cmake_minimum_required(VERSION 3.4)
+project(2DShadows)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
+add_definitions(-DGLEW_STATIC)
+if(WIN32)
+    add_definitions(-DWIN32)
+endif()
+
+add_library(lodepng libs/lodepng/lodepng.h libs/lodepng/lodepng.cpp libs/lodepng/lodepng_util.h libs/lodepng/lodepng_util.cpp)
+
+find_package(GLEW REQUIRED)
+if (GLEW_FOUND)
+    include_directories(${GLEW_INCLUDE_DIRS})
+    link_libraries(${GLEW_LIBRARIES})
+endif()
+
+add_subdirectory(libs/glfw)
+add_subdirectory(libs/glm)
+
+
+include_directories(libs/glm)
+include_directories(libs/lodepng)
+
+set(SOURCE_FILES main.cpp)
+add_executable(2DShadows ${SOURCE_FILES})
+
+
+set(libs glm glfw GLEW)
+
+
+if(WIN32)
+    set(libs ${libs} opengl32 )
+else(WIN32)
+    set(libs ${libs} GL )
+endif(WIN32)
+
+target_link_libraries(2DShadows ${libs} lodepng)
