@@ -10,3 +10,6 @@
 [submodule "libs/lodepng"]
 	path = libs/lodepng
 	url = git@github.com:lvandeve/lodepng.git
+[submodule "libs/nanogui"]
+	path = libs/nanogui
+	url = git@github.com:wjakob/nanogui.git

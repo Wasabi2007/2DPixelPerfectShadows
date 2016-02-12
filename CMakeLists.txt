@@ -10,24 +10,27 @@ endif()
 
 add_library(lodepng libs/lodepng/lodepng.h libs/lodepng/lodepng.cpp libs/lodepng/lodepng_util.h libs/lodepng/lodepng_util.cpp)
 
-find_package(GLEW REQUIRED)
-if (GLEW_FOUND)
-    include_directories(${GLEW_INCLUDE_DIRS})
-    link_libraries(${GLEW_LIBRARIES})
-endif()
 
-add_subdirectory(libs/glfw)
+
+#add_subdirectory(libs/glfw)
 add_subdirectory(libs/glm)
 
 
 include_directories(libs/glm)
 include_directories(libs/lodepng)
 
-set(SOURCE_FILES main.cpp)
+add_subdirectory(libs/nanogui)
+include_directories(${GLEW_INCLUDE_DIRS})
+include_directories(libs/nanogui/include)
+include_directories(libs/nanogui/ext/eigen)
+include_directories(libs/nanogui/ext/glew/include)
+include_directories(libs/nanogui/ext/nanovg/src)
+
+set(SOURCE_FILES main.cpp src/UI/main_screen.cpp src/UI/main_screen.hpp)
 add_executable(2DShadows ${SOURCE_FILES})
 
 
-set(libs glm glfw GLEW)
+set(libs nanogui glm glfw GLEW)
 
 
 if(WIN32)
