@@ -16,44 +16,51 @@
 #include <iostream>
 #include <nanogui/entypo.h>
 
-class main_screen : public nanogui::Screen {
-public:
-	main_screen(Eigen::Vector2i res, std::string s) : nanogui::Screen(res, s) {
-		using namespace nanogui;
+namespace UI {
+	class main_screen : public nanogui::Screen {
+	private:
+		static bool mvpreload;
 
-		auto *window = new Window(this, "Button demo");
-		window->setLayout(new GroupLayout());
-		window->setPosition(Vector2i(150, 150));
-		window->setFixedSize(Vector2i(400, 350));
+		static int width;
+		static int height;
+	public:
+		main_screen(Eigen::Vector2i res, std::string s) : nanogui::Screen(res, s) {
+			using namespace nanogui;
 
-		new Label(window, "Push buttons", "sans-bold");
+			auto *window = new Window(this, "Button demo");
+			window->setLayout(new GroupLayout());
+			window->setPosition(Vector2i(150, 150));
+			window->setFixedSize(Vector2i(400, 350));
 
-		Button *b = new Button(window, "Plain button");
-		b->setCallback([] { std::cout << "pushed!" << std::endl; });
-		b = new Button(window, "Styled", ENTYPO_ICON_ROCKET);
-		b->setBackgroundColor(Color(0, 0, 255, 25));
-		b->setCallback([] { std::cout << "pushed!" << std::endl; });
-	}
-	virtual bool keyboardEvent(int key, int scancode, int action, int modifiers) {
-		if (nanogui::Screen::keyboardEvent(key, scancode, action, modifiers))
-			return true;
-		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-			setVisible(false);
-			return true;
+			new Label(window, "Push buttons", "sans-bold");
+
+			Button *b = new Button(window, "Plain button");
+			b->setCallback([] { std::cout << "pushed!" << std::endl; });
+			b = new Button(window, "Styled", ENTYPO_ICON_ROCKET);
+			b->setBackgroundColor(Color(0, 0, 255, 25));
+			b->setCallback([] { std::cout << "pushed!" << std::endl; });
+
+			performLayout(mNVGContext);
 		}
-		return false;
-	}
 
-	virtual void draw(NVGcontext *ctx) {
-		/* Draw the user interface */
-		nanogui::Screen::draw(ctx);
-	}
+		virtual bool keyboardEvent(int key, int scancode, int action, int modifiers) {
+			if (nanogui::Screen::keyboardEvent(key, scancode, action, modifiers))
+				return true;
+			if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+				setVisible(false);
+				return true;
+			}
+			return false;
+		}
 
-	virtual void drawContents() {
-		using namespace nanogui;
-	}
+		virtual void draw(NVGcontext *ctx);
 
-};
+		virtual void drawContents();
 
+		void mainLoop(float dt);
+
+		void WindowSize();
+	};
+}
 
 #endif //INC_2DSHADOWS_MAIN_SCREEN_HPP

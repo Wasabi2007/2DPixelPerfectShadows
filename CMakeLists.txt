@@ -26,7 +26,7 @@ include_directories(libs/nanogui/ext/eigen)
 include_directories(libs/nanogui/ext/glew/include)
 include_directories(libs/nanogui/ext/nanovg/src)
 
-set(SOURCE_FILES main.cpp src/UI/main_screen.cpp src/UI/main_screen.hpp)
+set(SOURCE_FILES main.cpp src/UI/main_screen.cpp src/UI/main_screen.hpp src/Render/render_engine.cpp src/Render/render_engine.hpp)
 add_executable(2DShadows ${SOURCE_FILES})
 
 

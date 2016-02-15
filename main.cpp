@@ -35,7 +35,7 @@ int main() {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	    auto *screen = new main_screen(Eigen::Vector2i(2000, 1000), "2D Shadows");
+	    auto *screen = new UI::main_screen(Eigen::Vector2i(2000, 1000), "2D Shadows");
 
 		screen->drawAll();
 		screen->setVisible(true);
