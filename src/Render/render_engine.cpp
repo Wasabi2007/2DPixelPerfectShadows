@@ -3,3 +3,7 @@
 //
 
 #include "render_engine.hpp"
+
+namespace render {
+
+}

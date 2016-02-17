@@ -5,8 +5,7 @@
 #include <chrono>
 #include "main_screen.hpp"
 
-namespace UI {
-	bool main_screen::mvpreload = false;
+namespace ui {
 	int main_screen::width = 1024;
 	int main_screen::height = 768;
 
@@ -21,12 +20,12 @@ namespace UI {
 
 		glfwGetFramebufferSize(window, &width, &height);
 
-		if (main_screen::mvpreload || main_screen::width != width || main_screen::height != height) {
-			main_screen::width = width;
-			main_screen::height = height;
-			main_screen::mvpreload = false;
-			WindowSize();
+		if (main_screen::width != width || main_screen::height != height) {
+			_render_engine->window_resize(width,height);
 		}
+
+		_render_engine->render();
+
 	}
 
 	void main_screen::draw(NVGcontext *ctx) {
@@ -49,11 +48,21 @@ namespace UI {
 		nanogui::Screen::draw(ctx);
 	}
 
-	void main_screen::WindowSize() {
-
-	}
 
 	void main_screen::drawContents() {
 		using namespace nanogui;
+
+		mShader.bind();
+
+		Matrix4f _mvp;
+		_mvp.setIdentity();
+		_mvp.topLeftCorner<3,3>() = Matrix3f(Eigen::AngleAxisf((float) glfwGetTime(),  Vector3f::UnitZ())) * 0.25f;
+
+		_mvp.row(0) *= (float) mSize.y() / (float) mSize.x();
+
+		mShader.setUniform("modelViewProj", _mvp);
+
+		/* Draw 2 triangles starting at index 0 */
+		mShader.drawIndexed(GL_TRIANGLES, 0, 2);
 	}
 }
