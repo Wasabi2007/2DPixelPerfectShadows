@@ -58,7 +58,7 @@ namespace render {
 
 		void render_ocluders(glm::mat4 &mvp);
 
-		std::tuple<GLuint, GLuint> add_image(int width, int hight);
+		std::tuple<GLuint, GLuint> add_image(int width, int hight,bool flipu = true);
 	};
 }
 

@@ -7,8 +7,11 @@ varying vec2 var_uv;
 
 //uniform values
 uniform sampler2D shadow_map_texture;
-uniform vec2 resolution;
+uniform vec2 light_resolution;
 uniform vec4 Color;
+
+
+out vec4 out_color;
 
 //sample from the 1D distance map
 float sample(float coord, float r) {
@@ -20,18 +23,18 @@ void main(void) {
     vec2 norm = var_uv.st * 2.0 - 1.0;
     float theta = atan(norm.y, norm.x);
     float r = length(norm);
-    float coord = (theta + PI) / (2.0*PI);
+    float coord = 1-(theta + PI) / (2.0*PI);
 
     //the tex coord to sample our 1D lookup texture
     //always 0.0 on y axis
     vec2 tc = vec2(coord, 0.0);
 
     //the center tex coord, which gives us hard shadows
-    float center = sample(1-coord, r);
+    float center = sample(coord, r);
 
     //we multiply the blur amount by our distance from center
     //this leads to more blurriness as the shadow "fades away"
-    float blur = (1./resolution.x)  * smoothstep(0., 1., r);
+    float blur = (1./light_resolution.x) * smoothstep(0., 1., r);
 
     //now we use a simple gaussian blur
     float sum = 0.0;
@@ -52,5 +55,5 @@ void main(void) {
 
     //multiply the summed amount by our distance, which gives us a radial falloff
     //then multiply by vertex (light) color
-    gl_FragColor = Color * vec4(vec3(1.0), sum * smoothstep(1.0, 0.0, r));
+    out_color = Color * vec4(vec3(1.0), sum * smoothstep(1.0, 0.0, r));
 }

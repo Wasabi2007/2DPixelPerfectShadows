@@ -13,7 +13,9 @@ namespace render {
 		_shadow_render_shader->use_shader();
 		GLint matrix_id = _shadow_render_shader->getUniform("MVP");
 		auto color_id =  _shadow_render_shader->getUniform("Color");
+		auto res_id =  _shadow_render_shader->getUniform("light_resolution");
 		glUniform4f(color_id,1.0f,1.0f,1.0f,1.0f);
+		glUniform2f(res_id,256.f*4.f,256.f*4.f);
 		for(auto& img : _ligth_images){
 			glBindVertexArray(std::get<0>(img));
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, std::get<1>(img));
@@ -54,7 +56,7 @@ namespace render {
 		}
 	}
 
-	std::tuple<GLuint,GLuint> render_engine::add_image(int width,int height){
+	std::tuple<GLuint,GLuint> render_engine::add_image(int width,int height,bool flipu){
 		GLuint VertexArrayID;
 		GLuint vertexbuffer;
 		GLuint elementbuffer;
@@ -66,16 +68,16 @@ namespace render {
 		// An array of 3 vectors which represents 3 vertices
 		const GLfloat g_vertex_buffer_data[] = {
 				0.0f, 0.0f, 0.0f,//Position
-				0.0f, 0.0f, //UV
+				(flipu?1.f:0.f), 0.0f, //UV
 
 				float(width), 0.0f, 0.0f,//Position
-				1.0f, 0.0f, //UV
+				(flipu?0.f:1.f), 0.0f, //UV
 
 				float(width),  float(height), 0.0f,//Position
-				1.0f, 1.0f, //UV
+				(flipu?0.f:1.f), 1.0f, //UV
 
 				0.0f,  float(height), 0.0f,//Position
-				0.0f, 1.0f, //UV
+				(flipu?1.f:0.f), 1.0f, //UV
 		};
 
 
@@ -145,7 +147,7 @@ namespace render {
 		glDepthMask(GL_FALSE);
 
 		GLuint oclusion_fbo;
-		GLuint ligthsize = 256*2;
+		GLuint ligthsize = 256*4;
 		glm::vec3 pos{200,200,0};
 
 		glGenFramebuffers(1,&oclusion_fbo);
@@ -304,7 +306,7 @@ namespace render {
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0,0,ui::main_screen::width,ui::main_screen::height);
 
-		auto pic = add_image(ligthsize,ligthsize);
+		auto pic = add_image(ligthsize,ligthsize,false);
 
 		_ligth_images.emplace_back(std::get<0>(pic),std::get<1>(pic),shadow1D_texture,glm::vec3{pos.x-(ligthsize/2),pos.y-(ligthsize/2),0});
 	}
