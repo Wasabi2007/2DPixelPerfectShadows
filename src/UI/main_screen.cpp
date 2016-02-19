@@ -10,7 +10,8 @@ namespace ui {
 	int main_screen::height = 768;
 
 	void main_screen::mainLoop(float dt) {
-		glClearColor(0.4f, 0.6f, 0.9f, 1.f);
+		glClearColor(0.f, 0.f, 0.f, 0.f);
+		//glClearColor(0.4f, 0.6f, 0.9f, 1.f);
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

@@ -28,6 +28,7 @@ namespace render {
 			lodepng::load_file(png, path);
 			unsigned error = lodepng::decode(bufimage, width, height, png);
 
+
 			for(auto i = 0; i < width*height;++i){ // converting into opengl frendly pixel layout
 				auto a = bufimage.back();
 				bufimage.pop_back();

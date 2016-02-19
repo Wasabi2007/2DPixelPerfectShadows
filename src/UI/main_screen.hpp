@@ -21,13 +21,14 @@
 namespace ui {
 	class main_screen : public nanogui::Screen {
 	private:
-		static int width;
-		static int height;
-
 		nanogui::GLShader mShader;
 
 		std::unique_ptr<render::render_engine> _render_engine;
+
 	public:
+		static int width;
+		static int height;
+
 		main_screen(Eigen::Vector2i res, std::string s) : nanogui::Screen(res, s) {
 			using namespace nanogui;
 
@@ -87,6 +88,7 @@ namespace ui {
 
 			_render_engine->window_resize(res[0],res[1]);
 			_render_engine->add_image("textures/cat4.png");
+			_render_engine->calc_Light();
 		}
 		~main_screen(){
 			mShader.free();

@@ -40,3 +40,5 @@ else(WIN32)
 endif(WIN32)
 
 target_link_libraries(2DShadows ${libs} lodepng)
+
+FILE(COPY resources/. DESTINATION .)

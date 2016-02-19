@@ -32,11 +32,16 @@ int main() {
 		nanogui::init();
 		GLenum err = glGetError();
 
-
-
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+		if (GLEW_ARB_debug_output) {
+			glDebugMessageCallbackARB(
+					[](GLenum source, GLenum type, GLuint id, GLenum serverity, GLsizei length, const GLchar *message,
+					   const void *userParam) {
+						std::cout << message << std::endl;
+					}, nullptr);
+		}
 
 	    auto *screen = new ui::main_screen(Eigen::Vector2i(2000, 1000), "2D Shadows");
 
