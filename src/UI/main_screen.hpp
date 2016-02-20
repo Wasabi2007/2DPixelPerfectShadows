@@ -32,6 +32,9 @@ namespace ui {
 		main_screen(Eigen::Vector2i res, std::string s) : nanogui::Screen(res, s) {
 			using namespace nanogui;
 
+			main_screen::width = res[0];
+			main_screen::height = res[1];
+
 			auto *window = new Window(this, "Button demo");
 			window->setLayout(new GroupLayout());
 			window->setPosition(Vector2i(150, 150));
@@ -87,12 +90,16 @@ namespace ui {
 			_render_engine = std::make_unique<render::render_engine>();
 
 			_render_engine->window_resize(res[0],res[1]);
-			_render_engine->add_image("textures/cat4.png");
-			_render_engine->calc_Light();
+			_render_engine->add_image("textures/cat4.png", 2);
+			_render_engine->add_light(256*4,{400,400});
+
 		}
 		~main_screen(){
 			mShader.free();
 		}
+
+
+		virtual bool mouseButtonEvent(const Eigen::Vector2i &p, int button, bool down, int modifiers) override;
 
 		virtual bool keyboardEvent(int key, int scancode, int action, int modifiers) {
 			if (nanogui::Screen::keyboardEvent(key, scancode, action, modifiers))
@@ -109,6 +116,9 @@ namespace ui {
 		virtual void drawContents();
 
 		void mainLoop(float dt);
+
+		virtual bool mouseMotionEvent(const Eigen::Vector2i &p, const Eigen::Vector2i &rel, int button,
+									  int modifiers) override;
 	};
 }
 

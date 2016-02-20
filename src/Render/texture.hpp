@@ -13,9 +13,9 @@
 namespace render {
 	class texture{
 	private:
+	public:
 		//std::vector<unsigned char> data;
 		GLuint texture_id;
-	public:
 		unsigned width, height;
 
 		texture(std::string path){

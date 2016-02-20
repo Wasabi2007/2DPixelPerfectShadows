@@ -20,8 +20,12 @@ namespace render {
 		std::unique_ptr<shader> _shadow_mapper_shader;
 		std::unique_ptr<shader> _shadow_render_shader;
 		std::vector<std::tuple<GLuint,GLuint,texture>> _ocluder_images; //VAO, IBO, Texture
-		std::vector<std::tuple<GLuint,GLuint,GLuint,glm::vec3>> _ligth_images; //VAO, IBO, TextureID, Position
+		std::vector<std::tuple<GLuint,GLuint,GLuint,GLuint,glm::vec3,glm::vec4,glm::vec2>> _ligth_images; //VAO, IBO, Ocluder_Texture, 1DShadowmap, Position, Color, Size
 		glm::mat4 _mvp;
+		GLuint oclusion_fbo;
+		GLuint shadow1D_fbo;
+		GLuint quad_vertexbuffer;
+		GLuint quad_VertexArrayID;
 
 	public:
 		render_engine(){
@@ -40,6 +44,42 @@ namespace render {
 															 std::vector<shader_attribute>{{1,"in_pos"},{2,"in_uv"}},
 															 std::vector<shader_attribute>{{0,"out_color"}},
 															 std::vector<shader_attribute>{{0,"shadow_map_texture"}});
+
+			glGenFramebuffers(1,&oclusion_fbo);
+			glBindFramebuffer(GL_FRAMEBUFFER,oclusion_fbo);
+
+			glGenFramebuffers(1,&shadow1D_fbo);
+			glBindFramebuffer(GL_FRAMEBUFFER,shadow1D_fbo);
+
+			glBindFramebuffer(GL_FRAMEBUFFER,0);
+
+			quad_VertexArrayID;
+			glGenVertexArrays(1, &quad_VertexArrayID);
+			glBindVertexArray(quad_VertexArrayID);
+			static const GLfloat g_quad_vertex_buffer_data[] = {
+					-1.0f, -1.0f, 0.0f,
+					1.0f, -1.0f, 0.0f,
+					-1.0f,  1.0f, 0.0f,
+					-1.0f,  1.0f, 0.0f,
+					1.0f, -1.0f, 0.0f,
+					1.0f,  1.0f, 0.0f
+			};
+
+			glGenBuffers(1, &quad_vertexbuffer);
+			glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(g_quad_vertex_buffer_data), &g_quad_vertex_buffer_data, GL_STATIC_DRAW);
+
+			// 1rst attribute buffer : vertices
+			glEnableVertexAttribArray(1);
+			glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
+			glVertexAttribPointer(
+					1,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+					3,                  // size
+					GL_FLOAT,           // type
+					GL_FALSE,           // normalized?
+					(3*4),                  // stride
+					(void*)0            // array buffer offset
+			);
 		}
 
 
@@ -52,13 +92,17 @@ namespace render {
 		}
 
 		void render();
-		void calc_Light();
+		void add_light(unsigned int size = 256, glm::vec2 position = glm::vec2(),glm::vec4 color = glm::vec4(1,1,1,1));
 
-		void add_image(std::string path);
+		void add_image(std::string path, float scaling=1.f);
 
 		void render_ocluders(glm::mat4 &mvp);
 
-		std::tuple<GLuint, GLuint> add_image(int width, int hight,bool flipu = true);
+		std::tuple<GLuint, GLuint> add_image(float width, float hight, bool flipu = true);
+
+		void move_light(int index,glm::vec2 position);
+
+		void framebuffer_check(GLenum result) const;
 	};
 }
 

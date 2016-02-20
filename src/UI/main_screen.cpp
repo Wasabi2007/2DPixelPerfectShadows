@@ -66,4 +66,21 @@ namespace ui {
 		/* Draw 2 triangles starting at index 0 */
 		mShader.drawIndexed(GL_TRIANGLES, 0, 2);
 	}
+
+	bool main_screen::mouseButtonEvent(const Eigen::Vector2i &p, int button, bool down, int modifiers) {
+		if(down) {
+			_render_engine->move_light(0, glm::vec2(p.x(), height-p.y()));
+		}
+
+		return Widget::mouseButtonEvent(p, button, down, modifiers);
+	}
+
+
+	bool main_screen::mouseMotionEvent(const Eigen::Vector2i &p, const Eigen::Vector2i &rel, int button,
+									   int modifiers) {
+
+		_render_engine->move_light(0, glm::vec2(p.x(), height-p.y()));
+
+		return Widget::mouseMotionEvent(p, rel, button, modifiers);
+	}
 }
