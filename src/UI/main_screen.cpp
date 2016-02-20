@@ -79,7 +79,7 @@ namespace ui {
 	bool main_screen::mouseMotionEvent(const Eigen::Vector2i &p, const Eigen::Vector2i &rel, int button,
 									   int modifiers) {
 
-		_render_engine->move_light(0, glm::vec2(p.x(), height-p.y()));
+		//_render_engine->move_light(0, glm::vec2(p.x(), height-p.y()));
 
 		return Widget::mouseMotionEvent(p, rel, button, modifiers);
 	}

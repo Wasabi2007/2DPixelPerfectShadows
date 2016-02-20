@@ -25,6 +25,10 @@
 
 #include "src/UI/main_screen.hpp"
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 using namespace std;
 
 int main() {
