@@ -103,6 +103,13 @@ namespace render {
 		void move_light(int index,glm::vec2 position);
 
 		void framebuffer_check(GLenum result) const;
+
+		auto light_count() const {return _ligth_images.size();}
+
+		auto light_pos(int index){
+			auto& size = std::get<6>(_ligth_images.at(index));
+			auto& pos = std::get<4>(_ligth_images.at(index));
+			return glm::vec2{pos.x + size.x/2, pos.y + size.y/2 };}
 	};
 }
 

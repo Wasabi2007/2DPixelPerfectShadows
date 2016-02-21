@@ -24,12 +24,14 @@ namespace ui {
 		nanogui::GLShader mShader;
 
 		std::unique_ptr<render::render_engine> _render_engine;
+		static int select_size;
+		int selected;
 
 	public:
 		static int width;
 		static int height;
 
-		main_screen(Eigen::Vector2i res, std::string s) : nanogui::Screen(res, s) {
+		main_screen(Eigen::Vector2i res, std::string s) : nanogui::Screen(res, s),selected(-1) {
 			using namespace nanogui;
 
 			main_screen::width = res[0];

@@ -8,6 +8,7 @@
 namespace ui {
 	int main_screen::width = 1024;
 	int main_screen::height = 768;
+	int main_screen::select_size = 126;
 
 	void main_screen::mainLoop(float dt) {
 		glClearColor(0.f, 0.f, 0.f, 0.f);
@@ -68,8 +69,23 @@ namespace ui {
 	}
 
 	bool main_screen::mouseButtonEvent(const Eigen::Vector2i &p, int button, bool down, int modifiers) {
+		static std::random_device r;
+		static std::default_random_engine e1(r());
+		static std::uniform_real_distribution<float> uniform_dist(0, 1);
+
 		if(down) {
-			_render_engine->move_light(0, glm::vec2(p.x(), height-p.y()));
+			for(int i = 0; i < _render_engine->light_count(); ++i) {
+				auto light_pos = _render_engine->light_pos(i);
+				auto distance = glm::distance(light_pos,{p.x(), height - p.y()});
+				if(distance<select_size){
+					selected = i;
+				}
+			}
+			if(selected == -1){
+				_render_engine->add_light(256,{p.x(), height - p.y()},{uniform_dist(e1),uniform_dist(e1),uniform_dist(e1),1.f});
+			}
+		} else{
+			selected = -1;
 		}
 
 		return Widget::mouseButtonEvent(p, button, down, modifiers);
@@ -78,8 +94,9 @@ namespace ui {
 
 	bool main_screen::mouseMotionEvent(const Eigen::Vector2i &p, const Eigen::Vector2i &rel, int button,
 									   int modifiers) {
-
-		_render_engine->move_light(0, glm::vec2(p.x(), height-p.y()));
+		if(selected != -1) {
+			_render_engine->move_light(selected, glm::vec2(p.x(), height - p.y()));
+		}
 
 		return Widget::mouseMotionEvent(p, rel, button, modifiers);
 	}
