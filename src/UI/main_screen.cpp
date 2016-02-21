@@ -94,6 +94,7 @@ namespace ui {
 
 	bool main_screen::mouseMotionEvent(const Eigen::Vector2i &p, const Eigen::Vector2i &rel, int button,
 									   int modifiers) {
+
 		if(selected != -1) {
 			_render_engine->move_light(selected, glm::vec2(p.x(), height - p.y()));
 		}
