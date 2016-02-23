@@ -7,11 +7,24 @@
 
 namespace render {
 	void render_engine::render(){
+		_basicshader->use_shader();
+		GLint matrix_id = _basicshader->getUniform("MVP");
+		glUniformMatrix4fv(matrix_id, 1, GL_FALSE, &_mvp[0][0]);
+
+		for(auto& img : _background_images){
+			glBindVertexArray(std::get<0>(img));
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, std::get<1>(img));
+
+			std::get<2>(img).bind();
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		}
+
+
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 		//glBlendFunc(GL_ONE, GL_ONE);
 		_shadow_render_shader->use_shader();
-		GLint matrix_id = _shadow_render_shader->getUniform("MVP");
+		matrix_id = _shadow_render_shader->getUniform("MVP");
 		auto color_id =  _shadow_render_shader->getUniform("Color");
 		auto res_id =  _shadow_render_shader->getUniform("light_resolution");
 
@@ -40,6 +53,15 @@ namespace render {
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}
 
+	}
+
+	void render_engine::add_background(std::string path, float scaling){
+		auto img = texture(path);
+
+		auto data = add_image(img.width*scaling,img.height*scaling);
+		auto image_tupel = std::tuple<GLuint,GLuint,texture>(std::get<0>(data),std::get<1>(data),std::move(img));
+
+		_background_images.emplace_back(std::move(image_tupel));
 	}
 
 	void render_engine::render_ocluders(glm::mat4 &mvp) {
@@ -146,7 +168,7 @@ namespace render {
 	void render_engine::move_light(int index,glm::vec2 position){
 		glDisable(GL_DEPTH_TEST);
 		glDepthMask(GL_FALSE);
-		auto& ligth = _ligth_images[index];
+		auto& ligth = _ligth_images.at(index);
 
 		auto& oclusion_texture = std::get<2>(ligth);
 		auto& shadow1D_texture = std::get<3>(ligth);
@@ -201,6 +223,14 @@ namespace render {
 		glViewport(0,0,ui::main_screen::width,ui::main_screen::height);
 	}
 
+	void render_engine::remove_light(int index){
+		auto& light = _ligth_images.at(index);
+		glDeleteTextures(1,&std::get<2>(light));
+		glDeleteTextures(1,&std::get<3>(light));
+
+		_ligth_images.erase(_ligth_images.begin()+index);
+	}
+
 	void render_engine::add_light(unsigned int size, glm::vec2 position, glm::vec4 color) {
 		glDisable(GL_DEPTH_TEST);
 		glDepthMask(GL_FALSE);
@@ -230,13 +260,15 @@ namespace render {
 		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 		// Set "oclusion_texture" as our colour attachement #0
+		//glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, 0, 0);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, oclusion_texture, 0);
 
+		//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_rb);
 
-		glBindFramebuffer(GL_FRAMEBUFFER,oclusion_fbo);
+
+		//glBindFramebuffer(GL_FRAMEBUFFER,oclusion_fbo);
 		// Set the list of draw buffers.
-		GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
-		glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
+
 
 		// Always check that our framebuffer is ok
 		auto result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -275,11 +307,14 @@ namespace render {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 		// Set "oclusion_texture" as our colour attachement #0
+		//glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, 0, 0);
+
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, shadow1D_texture, 0);
-		glBindFramebuffer(GL_FRAMEBUFFER,shadow1D_fbo);
+		//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_rb);
+		//glBindFramebuffer(GL_FRAMEBUFFER,shadow1D_fbo);
 		// Set the list of draw buffers.
-		GLenum Draw_Buffers[1] = {GL_COLOR_ATTACHMENT0};
-		glDrawBuffers(1, Draw_Buffers); // "1" is the size of DrawBuffers
+		//GLenum Draw_Buffers[1] = {GL_COLOR_ATTACHMENT0};
+		//glDrawBuffers(1, Draw_Buffers); // "1" is the size of DrawBuffers
 
 		// Always check that our framebuffer is ok
 		result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -340,4 +375,5 @@ namespace render {
 															  std::endl;//  is returned if any framebuffer attachment is layered, and any populated attachment is not layered, or if all populated color attachments are not from textures of the same target.
 
 	}
+
 }

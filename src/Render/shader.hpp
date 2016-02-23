@@ -74,11 +74,29 @@ namespace render {
 
 			glLinkProgram(shaderid);
 
+
+			GLint isLinked = 0;
+			glGetProgramiv(shaderid, GL_LINK_STATUS, (int *)&isLinked);
+			if(isLinked == GL_FALSE)
+			{
+				GLint maxLength = 0;
+				glGetProgramiv(shaderid, GL_INFO_LOG_LENGTH, &maxLength);
+
+				//The maxLength includes the NULL character
+				std::vector<GLchar> infoLog(maxLength);
+				glGetProgramInfoLog(shaderid, maxLength, &maxLength, &infoLog[0]);
+				std::cerr << "ProgrammLogLength: " << maxLength<< std::endl;
+				std::cerr << "GL_LINK_STATUS: " << isLinked<< std::endl;
+				std::cerr << &infoLog[0] << std::endl;
+
+				///return;
+			}
 			glUseProgram(shaderid);
 			for(auto& at : TextureBindings) {
 				glUniform1i(glGetUniformLocation(shaderid, at.name.c_str()), at.attribpos);
 			}
-			check_shader();
+
+			//check_shader();
 		}
 
 		void load_shader(){
@@ -117,12 +135,16 @@ namespace render {
 		void check_shader() {
 			GLint Result = GL_FALSE;
 			int InfoLogLength;
-			// Check Vertex Shader
+			// Check Shader
 			glGetShaderiv(shaderid, GL_COMPILE_STATUS, &Result);
 			glGetShaderiv(shaderid, GL_INFO_LOG_LENGTH, &InfoLogLength);
-			std::vector<char> VertexShaderErrorMessage(InfoLogLength);
-			glGetShaderInfoLog(shaderid, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
-			std::cerr << &VertexShaderErrorMessage[0] << std::endl;
+			std::vector<char> ShaderErrorMessage(InfoLogLength);
+			glGetShaderInfoLog(shaderid, InfoLogLength, NULL, &ShaderErrorMessage[0]);
+			if(Result == GL_FALSE) {
+				std::cerr << "InfoLogLength: " << InfoLogLength << std::endl;
+				std::cerr << "GL_COMPILE_STATUS: " << Result << std::endl;
+				std::cerr << &ShaderErrorMessage[0] << std::endl;
+			}
 
 			if(Result == GL_TRUE)
 				loaded = true;

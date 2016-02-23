@@ -20,12 +20,14 @@ namespace render {
 		std::unique_ptr<shader> _shadow_mapper_shader;
 		std::unique_ptr<shader> _shadow_render_shader;
 		std::vector<std::tuple<GLuint,GLuint,texture>> _ocluder_images; //VAO, IBO, Texture
+		std::vector<std::tuple<GLuint,GLuint,texture>> _background_images; //VAO, IBO, Texture
 		std::vector<std::tuple<GLuint,GLuint,GLuint,GLuint,glm::vec3,glm::vec4,glm::vec2>> _ligth_images; //VAO, IBO, Ocluder_Texture, 1DShadowmap, Position, Color, Size
 		glm::mat4 _mvp;
 		GLuint oclusion_fbo;
 		GLuint shadow1D_fbo;
 		GLuint quad_vertexbuffer;
 		GLuint quad_VertexArrayID;
+		GLuint depth_rb;
 
 	public:
 		render_engine(){
@@ -47,9 +49,12 @@ namespace render {
 
 			glGenFramebuffers(1,&oclusion_fbo);
 			glBindFramebuffer(GL_FRAMEBUFFER,oclusion_fbo);
+			GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+			glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
 
 			glGenFramebuffers(1,&shadow1D_fbo);
 			glBindFramebuffer(GL_FRAMEBUFFER,shadow1D_fbo);
+			glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
 
 			glBindFramebuffer(GL_FRAMEBUFFER,0);
 
@@ -80,6 +85,14 @@ namespace render {
 					(3*4),                  // stride
 					(void*)0            // array buffer offset
 			);
+
+
+			glGenRenderbuffers(1, &depth_rb);
+			glBindRenderbuffer(GL_RENDERBUFFER, depth_rb);
+			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 256, 256);
+			//-------------------------
+			//Attach depth buffer to FBO
+
 		}
 
 
@@ -110,6 +123,12 @@ namespace render {
 			auto& size = std::get<6>(_ligth_images.at(index));
 			auto& pos = std::get<4>(_ligth_images.at(index));
 			return glm::vec2{pos.x + size.x/2, pos.y + size.y/2 };}
+
+		void remove_light(int index);
+
+		void add_background();
+
+		void add_background(std::string path, float scaling);
 	};
 }
 

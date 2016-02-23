@@ -3,7 +3,7 @@
 #define PI 3.14159265359
 
 //inputs from vertex shader
-varying vec2 var_uv;
+in vec2 var_uv;
 
 //uniform values
 uniform sampler2D shadow_map_texture;

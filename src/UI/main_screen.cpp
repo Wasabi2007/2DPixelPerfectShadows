@@ -69,26 +69,27 @@ namespace ui {
 	}
 
 	bool main_screen::mouseButtonEvent(const Eigen::Vector2i &p, int button, bool down, int modifiers) {
-		static std::random_device r;
-		static std::default_random_engine e1(r());
-		static std::uniform_real_distribution<float> uniform_dist(0, 1);
+		auto result = Widget::mouseButtonEvent(p, button, down, modifiers);
 
-		if(down) {
-			for(int i = 0; i < _render_engine->light_count(); ++i) {
-				auto light_pos = _render_engine->light_pos(i);
-				auto distance = glm::distance(light_pos,{p.x(), height - p.y()});
-				if(distance<select_size){
-					selected = i;
+		if(!result) {
+			if (down) {
+				for (int i = 0; i < _render_engine->light_count(); ++i) {
+					auto light_pos = _render_engine->light_pos(i);
+					auto distance = glm::distance(light_pos, {p.x(), height - p.y()});
+					if (distance < select_size) {
+						selected = i;
+					}
 				}
+				if (selected == -1) {
+					_render_engine->add_light(unsigned(size), {p.x(), height - p.y()},_color);
+				}
+			} else {
+				selected = -1;
 			}
-			if(selected == -1){
-				_render_engine->add_light(256,{p.x(), height - p.y()},{uniform_dist(e1),uniform_dist(e1),uniform_dist(e1),1.f});
-			}
-		} else{
-			selected = -1;
+
 		}
 
-		return Widget::mouseButtonEvent(p, button, down, modifiers);
+		return result;
 	}
 
 
