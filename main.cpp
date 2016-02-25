@@ -47,7 +47,7 @@ int main() {
 					}, nullptr);
 		}
 
-	    auto *screen = new ui::main_screen(Eigen::Vector2i(2000, 1000), "2D Shadows");
+	    auto *screen = new ui::main_screen(Eigen::Vector2i(1024, 768), "2D Shadows");
 
 		screen->drawAll();
 		screen->setVisible(true);

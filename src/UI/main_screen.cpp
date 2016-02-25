@@ -24,6 +24,8 @@ namespace ui {
 
 		if (main_screen::width != width || main_screen::height != height) {
 			_render_engine->window_resize(width,height);
+			main_screen::width = width;
+			main_screen::height = height;
 		}
 
 		_render_engine->render();
