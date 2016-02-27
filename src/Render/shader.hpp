@@ -13,6 +13,7 @@
 
 namespace render {
 	enum class shader_type{
+		Programm,
 		Vertex,
 		Fragment,
 		Geometry
@@ -37,12 +38,15 @@ namespace render {
 		shader(shader vertex, shader fragment
 				,const std::vector<shader_attribute>& AttribLocations
 				,const std::vector<shader_attribute>& FragDataLocations
-				,const std::vector<shader_attribute>& TextureBindings = std::vector<shader_attribute>()):shaderid(0),loaded(false){
+				,const std::vector<shader_attribute>& TextureBindings = std::vector<shader_attribute>()):shaderid(0),loaded(false),type(shader_type::Programm){
 			load_programm(vertex, fragment, AttribLocations, FragDataLocations,TextureBindings);
 		}
 
 		~shader(){
-			glDeleteShader(shaderid);
+			if(type == shader_type::Programm)
+				glDeleteProgram(shaderid);
+			else
+				glDeleteShader(shaderid);
 		}
 
 		void use_shader(){
