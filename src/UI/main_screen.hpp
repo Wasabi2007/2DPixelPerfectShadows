@@ -28,6 +28,7 @@ namespace ui {
 		std::unique_ptr<render::render_engine> _render_engine;
 		static int select_size;
 		int selected;
+		int hover_selected;
 		glm::vec4 _color;
 		float size;
 
@@ -41,12 +42,12 @@ namespace ui {
 			main_screen::width = res[0];
 			main_screen::height = res[1];
 
-			auto *window = new Window(this, "Button demo");
+			auto *window = new Window(this, "Light Control");
 			window->setLayout(new GroupLayout());
 			window->setPosition(Vector2i(150, 150));
 			window->setFixedSize(Vector2i(400, 350));
 
-			new Label(window, "Push buttons", "sans-bold");
+			//new Label(window, "Push buttons", "sans-bold");
 
 			/*Button *b = new Button(window, "Plain button");
 			b->setCallback([] { std::cout << "pushed!" << std::endl; });
@@ -54,12 +55,14 @@ namespace ui {
 			b->setBackgroundColor(Color(0, 0, 255, 25));
 			b->setCallback([] { std::cout << "pushed!" << std::endl; });*/
 
+			new Label(window,"Ligth color:");
 			ColorWheel *cw = new ColorWheel(window);
 			cw->setColor({_color.r,_color.g,_color.b,_color.a});
 			cw->setCallback([this](const Color &value){
 				_color = glm::vec4{value.r(),value.g(),value.b(),1.f};
 			});
 
+			new Label(window,"Ligth size:");
 			Slider *_slider = new Slider(window);
 			_slider->setValue(size/1024);
 			_slider->setCallback([this](const float& value){
@@ -137,6 +140,8 @@ namespace ui {
 
 		virtual bool mouseMotionEvent(const Eigen::Vector2i &p, const Eigen::Vector2i &rel, int button,
 									  int modifiers) override;
+
+		int select_light(glm::vec2 pos);
 	};
 }
 

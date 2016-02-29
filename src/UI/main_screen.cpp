@@ -73,23 +73,25 @@ namespace ui {
 
 		if(!result) {
 			if (down) {
-				for (int i = 0; i < _render_engine->light_count(); ++i) {
-					auto light_pos = _render_engine->light_pos(i);
-					auto distance = glm::distance(light_pos, {p.x(), height - p.y()});
-					if (distance < select_size) {
-						selected = i;
-					}
-				}
+				selected = select_light({p.x(), height - p.y()});
 				if (selected == -1) {
 					_render_engine->add_light(unsigned(size), {p.x(), height - p.y()},_color);
 				}
 			} else {
 				selected = -1;
 			}
-
 		}
-
 		return result;
+	}
+
+	int main_screen::select_light(glm::vec2 pos){
+		for (int i = 0; i < _render_engine->light_count(); ++i) {
+			auto light_pos = _render_engine->light_pos(i);
+			auto distance = glm::distance(light_pos, pos);
+			if (distance < select_size) {
+				return i;
+			}
+		}
 	}
 
 
@@ -98,6 +100,9 @@ namespace ui {
 
 		if(selected != -1) {
 			_render_engine->move_light(selected, glm::vec2(p.x(), height - p.y()));
+			hover_selected = selected;
+		} else{
+			hover_selected = select_light({p.x(), height - p.y()});
 		}
 
 		return Widget::mouseMotionEvent(p, rel, button, modifiers);

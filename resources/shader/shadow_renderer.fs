@@ -10,6 +10,10 @@ uniform sampler2D shadow_map_texture;
 uniform vec2 light_resolution;
 uniform vec4 Color;
 
+//usability stuff
+uniform float selected;
+uniform float blur_factor;
+
 
 out vec4 out_color;
 
@@ -53,7 +57,9 @@ void main(void) {
 
     //sum of 1.0 -> in light, 0.0 -> in shadow
 
+    sum = (1-blur_factor)*sum + (blur_factor)*center;
+
     //multiply the summed amount by our distance, which gives us a radial falloff
     //then multiply by vertex (light) color
-    out_color = Color * vec4(vec3(1.0), sum * smoothstep(1.0, 0.0, r));
+    out_color = Color * vec4(vec3(1.0), sum * ((1-selected)*smoothstep(1.0, 0.0, r)+(selected));
 }

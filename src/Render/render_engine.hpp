@@ -14,6 +14,16 @@
 #include <memory>
 
 namespace render {
+	struct light{
+		const GLuint vbo;
+		const GLuint ibo;
+		const GLuint ocluder_texture;
+		const GLuint shadowmap_texture;
+		glm::vec3 position;
+		glm::vec4 color;
+		glm::vec2 size;
+
+	};
 	class render_engine {
 	private:
 		std::unique_ptr<shader> _basicshader;
