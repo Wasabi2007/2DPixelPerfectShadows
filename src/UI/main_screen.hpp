@@ -31,12 +31,19 @@ namespace ui {
 		int hover_selected;
 		glm::vec4 _color;
 		float size;
+		bool move;
 
 	public:
 		static int width;
 		static int height;
 
-		main_screen(Eigen::Vector2i res, std::string s) : nanogui::Screen(res, s),selected(-1),hover_selected(-1),_color(1),size(256) {
+		main_screen(Eigen::Vector2i res, std::string s) :
+				nanogui::Screen(res, s),
+				selected(-1),
+				hover_selected(-1),
+				_color(1),
+				size(256),
+				move(false){
 			using namespace nanogui;
 
 			main_screen::width = res[0];

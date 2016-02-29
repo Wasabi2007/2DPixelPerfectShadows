@@ -73,12 +73,14 @@ namespace ui {
 
 		if(!result) {
 			if (down) {
+				move = true;
 				selected = select_light({p.x(), height - p.y()});
 				if (selected == -1) {
 					_render_engine->add_light(unsigned(size), {p.x(), height - p.y()},_color);
+					move = false;
 				}
-			} else {
-				selected = -1;
+			} else{
+				move = false;
 			}
 		}
 		return result;
@@ -99,7 +101,7 @@ namespace ui {
 	bool main_screen::mouseMotionEvent(const Eigen::Vector2i &p, const Eigen::Vector2i &rel, int button,
 									   int modifiers) {
 
-		if(selected != -1) {
+		if(move && selected != -1) {
 			_render_engine->move_light(selected, glm::vec2(p.x(), height - p.y()));
 			hover_selected = selected;
 		} else{
