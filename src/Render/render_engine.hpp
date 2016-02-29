@@ -23,11 +23,14 @@ namespace render {
 		glm::vec4 color;
 		glm::vec2 size;
 
+		float selceted;
+		float blur_factor;
+
 		light() = delete;
 		light(light& l) = delete;
 
 		light(light&& l) = default;
-		light& operator=(const light& l) = default;
+		light& operator=(const light& l) = delete;
 		light& operator=(light&& l) = default;
 
 		light(const GLuint vao, const GLuint ibo, const GLuint ocluder_texture, const GLuint shadowmap_texture,
@@ -37,14 +40,15 @@ namespace render {
 																						  shadowmap_texture(
 																								  shadowmap_texture),
 																						  position(position),
-																						  color(color), size(size) { }
+																						  color(color), size(size),selceted(0),blur_factor(0) { }
 
 		~light(){
 			std::cout << "unexpected delet of a light" << std::endl;
-			glDeleteBuffers(1,&vao);
-			glDeleteBuffers(1,&ibo);
-			glDeleteTextures(1,&ocluder_texture);
-			glDeleteTextures(1,&shadowmap_texture);
+			//Todo: Why does a vector delet this?
+			//glDeleteBuffers(1,&vao);
+			//glDeleteBuffers(1,&ibo);
+			//glDeleteTextures(1,&ocluder_texture);
+			//glDeleteTextures(1,&shadowmap_texture);
 		}
 
 	};
@@ -63,8 +67,10 @@ namespace render {
 		GLuint quad_VertexArrayID;
 		GLuint depth_rb;
 
+		float global_blur_factor;
+
 	public:
-		render_engine(){
+		render_engine():global_blur_factor(0){
 			_basicshader = std::make_unique<shader>(shader{"shader/basic.vs", shader_type::Vertex},
 													shader{"shader/basic.fs",shader_type::Fragment},
 													std::vector<shader_attribute>{{1,"in_pos"},{2,"in_uv"}},
@@ -158,9 +164,20 @@ namespace render {
 			auto& pos = _ligth_images.at(index).position;
 			return glm::vec2{pos.x + size.x/2, pos.y + size.y/2 };}
 
+		void light_select(int index){
+			_ligth_images.at(index).selceted = 1;
+		}
+		void light_deselect(int index){
+			_ligth_images.at(index).selceted = 0;
+		}
+
 		void remove_light(int index);
 
 		void add_background(std::string path, float scaling);
+
+		void toogle_blur(){
+			global_blur_factor = 1-global_blur_factor;
+		}
 	};
 }
 

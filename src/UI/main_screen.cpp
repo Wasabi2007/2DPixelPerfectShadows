@@ -92,6 +92,7 @@ namespace ui {
 				return i;
 			}
 		}
+		return -1;
 	}
 
 
@@ -102,7 +103,14 @@ namespace ui {
 			_render_engine->move_light(selected, glm::vec2(p.x(), height - p.y()));
 			hover_selected = selected;
 		} else{
-			hover_selected = select_light({p.x(), height - p.y()});
+			auto sel = select_light({p.x(), height - p.y()});
+			if(sel != hover_selected && hover_selected != -1){
+				_render_engine->light_deselect(hover_selected);
+			}
+			hover_selected = sel;
+			if(hover_selected != -1){
+				_render_engine->light_select(hover_selected);
+			}
 		}
 
 		return Widget::mouseMotionEvent(p, rel, button, modifiers);

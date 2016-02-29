@@ -27,6 +27,10 @@ namespace render {
 		matrix_id = _shadow_render_shader->getUniform("MVP");
 		auto color_id =  _shadow_render_shader->getUniform("Color");
 		auto res_id =  _shadow_render_shader->getUniform("light_resolution");
+		auto selected_id =  _shadow_render_shader->getUniform("selected");
+		auto blur_factor_id =  _shadow_render_shader->getUniform("blur_factor");
+		glUniform1f(blur_factor_id,global_blur_factor);
+
 
 		for(auto& img : _ligth_images){
 			glBindVertexArray(img.vao);
@@ -35,6 +39,7 @@ namespace render {
 			glBindTexture(GL_TEXTURE_2D, img.shadowmap_texture);
 			glm::mat4 mvp = glm::translate(_mvp,img.position);
 			glUniform4fv(color_id,1,&img.color[0]);
+			glUniform1f(selected_id,img.selceted);
 			glUniform2fv(res_id,1,&img.size[0]);
 			glUniformMatrix4fv(matrix_id, 1, GL_FALSE, &mvp[0][0]);
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
