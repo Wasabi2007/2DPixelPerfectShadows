@@ -15,13 +15,37 @@
 
 namespace render {
 	struct light{
-		const GLuint vbo;
-		const GLuint ibo;
-		const GLuint ocluder_texture;
-		const GLuint shadowmap_texture;
+		GLuint vao;
+		GLuint ibo;
+		GLuint ocluder_texture;
+		GLuint shadowmap_texture;
 		glm::vec3 position;
 		glm::vec4 color;
 		glm::vec2 size;
+
+		light() = delete;
+		light(light& l) = delete;
+
+		light(light&& l) = default;
+		light& operator=(const light& l) = default;
+		light& operator=(light&& l) = default;
+
+		light(const GLuint vao, const GLuint ibo, const GLuint ocluder_texture, const GLuint shadowmap_texture,
+			  const glm::vec3 &position, const glm::vec4 &color, const glm::vec2 &size) : vao(vao), ibo(ibo),
+																						  ocluder_texture(
+																								  ocluder_texture),
+																						  shadowmap_texture(
+																								  shadowmap_texture),
+																						  position(position),
+																						  color(color), size(size) { }
+
+		~light(){
+			std::cout << "unexpected delet of a light" << std::endl;
+			glDeleteBuffers(1,&vao);
+			glDeleteBuffers(1,&ibo);
+			glDeleteTextures(1,&ocluder_texture);
+			glDeleteTextures(1,&shadowmap_texture);
+		}
 
 	};
 	class render_engine {
@@ -31,7 +55,7 @@ namespace render {
 		std::unique_ptr<shader> _shadow_render_shader;
 		std::vector<std::tuple<GLuint,GLuint,texture>> _ocluder_images; //VAO, IBO, Texture
 		std::vector<std::tuple<GLuint,GLuint,texture>> _background_images; //VAO, IBO, Texture
-		std::vector<std::tuple<GLuint,GLuint,GLuint,GLuint,glm::vec3,glm::vec4,glm::vec2>> _ligth_images; //VAO, IBO, Ocluder_Texture, 1DShadowmap, Position, Color, Size
+		std::vector<light> _ligth_images; //VAO, IBO, Ocluder_Texture, 1DShadowmap, Position, Color, Size
 		glm::mat4 _mvp;
 		GLuint oclusion_fbo;
 		GLuint shadow1D_fbo;
@@ -130,13 +154,11 @@ namespace render {
 		auto light_count() const {return _ligth_images.size();}
 
 		auto light_pos(int index){
-			auto& size = std::get<6>(_ligth_images.at(index));
-			auto& pos = std::get<4>(_ligth_images.at(index));
+			auto& size = _ligth_images.at(index).size;
+			auto& pos = _ligth_images.at(index).position;
 			return glm::vec2{pos.x + size.x/2, pos.y + size.y/2 };}
 
 		void remove_light(int index);
-
-		void add_background();
 
 		void add_background(std::string path, float scaling);
 	};

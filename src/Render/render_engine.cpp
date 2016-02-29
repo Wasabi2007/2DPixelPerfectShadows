@@ -29,13 +29,13 @@ namespace render {
 		auto res_id =  _shadow_render_shader->getUniform("light_resolution");
 
 		for(auto& img : _ligth_images){
-			glBindVertexArray(std::get<0>(img));
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, std::get<1>(img));
+			glBindVertexArray(img.vao);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, img.ibo);
 
-			glBindTexture(GL_TEXTURE_2D, std::get<3>(img));
-			glm::mat4 mvp = glm::translate(_mvp,std::get<4>(img));
-			glUniform4fv(color_id,1,&std::get<5>(img)[0]);
-			glUniform2fv(res_id,1,&std::get<6>(img)[0]);
+			glBindTexture(GL_TEXTURE_2D, img.shadowmap_texture);
+			glm::mat4 mvp = glm::translate(_mvp,img.position);
+			glUniform4fv(color_id,1,&img.color[0]);
+			glUniform2fv(res_id,1,&img.size[0]);
 			glUniformMatrix4fv(matrix_id, 1, GL_FALSE, &mvp[0][0]);
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}
@@ -170,10 +170,10 @@ namespace render {
 		glDepthMask(GL_FALSE);
 		auto& ligth = _ligth_images.at(index);
 
-		auto& oclusion_texture = std::get<2>(ligth);
-		auto& shadow1D_texture = std::get<3>(ligth);
-		auto& size = std::get<6>(ligth);
-		std::get<4>(ligth) = glm::vec3{position.x-(size.x/2),position.y-(size.y/2),0};//glm::vec3{position.x,position.y,0};
+		auto& oclusion_texture = ligth.ocluder_texture;
+		auto& shadow1D_texture = ligth.shadowmap_texture;
+		auto& size = ligth.size;
+		ligth.position = glm::vec3{position.x-(size.x/2),position.y-(size.y/2),0};//glm::vec3{position.x,position.y,0};
 
 		glBindFramebuffer(GL_FRAMEBUFFER,oclusion_fbo);
 		glBindTexture(GL_TEXTURE_2D, oclusion_texture);
@@ -224,9 +224,9 @@ namespace render {
 	}
 
 	void render_engine::remove_light(int index){
-		auto& light = _ligth_images.at(index);
+		/*auto& light = _ligth_images.at(index);
 		glDeleteTextures(1,&std::get<2>(light));
-		glDeleteTextures(1,&std::get<3>(light));
+		glDeleteTextures(1,&std::get<3>(light));*/
 
 		_ligth_images.erase(_ligth_images.begin()+index);
 	}
