@@ -77,7 +77,13 @@ namespace ui {
 				selected = select_light({p.x(), height - p.y()});
 				if (selected == -1) {
 					_render_engine->add_light(unsigned(size), {p.x(), height - p.y()},_color);
-					move = false;
+					selected = _render_engine->light_count()-1;
+					if(hover_selected != -1){
+						_render_engine->light_deselect(hover_selected);
+					}
+					hover_selected = selected;
+					_render_engine->light_select(hover_selected);
+
 				}
 			} else{
 				move = false;

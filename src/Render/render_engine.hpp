@@ -12,6 +12,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <memory>
+#include <iomanip>
+#include <utility>
 
 namespace render {
 	struct light{
@@ -26,10 +28,25 @@ namespace render {
 		float selceted;
 		float blur_factor;
 
+		bool _owner;
+
 		light() = delete;
 		light(light& l) = delete;
 
-		light(light&& l) = default;
+		light(light&& l):
+				vao(std::move(l.vao)),
+				ibo(std::move(l.ibo)),
+				ocluder_texture(std::move(l.ocluder_texture)),
+				shadowmap_texture(std::move(l.shadowmap_texture)),
+				position(std::move(l.position)),
+				color(std::move(l.color)),
+				size(std::move(l.size)),
+				selceted(std::move(l.selceted)),
+				blur_factor(std::move(l.blur_factor)),
+				_owner(true)
+		{
+			l._owner = false;
+		}
 		light& operator=(const light& l) = delete;
 		light& operator=(light&& l) = default;
 
@@ -40,15 +57,15 @@ namespace render {
 																						  shadowmap_texture(
 																								  shadowmap_texture),
 																						  position(position),
-																						  color(color), size(size),selceted(0),blur_factor(0) { }
+																						  color(color),_owner(true), size(size),selceted(0),blur_factor(0) { }
 
-		~light(){
-			std::cout << "unexpected delet of a light" << std::endl;
-			//Todo: Why does a vector delet this?
-			//glDeleteBuffers(1,&vao);
-			//glDeleteBuffers(1,&ibo);
-			//glDeleteTextures(1,&ocluder_texture);
-			//glDeleteTextures(1,&shadowmap_texture);
+		~light() {
+			if (_owner) {
+				glDeleteBuffers(1,&vao);
+				glDeleteBuffers(1,&ibo);
+				glDeleteTextures(1,&ocluder_texture);
+				glDeleteTextures(1,&shadowmap_texture);
+			}
 		}
 
 	};
