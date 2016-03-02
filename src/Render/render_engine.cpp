@@ -19,7 +19,6 @@ namespace render {
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}
 
-
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 		//glBlendFunc(GL_ONE, GL_ONE);
@@ -45,6 +44,12 @@ namespace render {
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		auto error = glGetError();
+
+		if(error != GL_NO_ERROR){
+			//std::cerr << "this shouldn't happend" << std::endl;
+		}
 
 		_basicshader->use_shader();
 		matrix_id = _basicshader->getUniform("MVP");
@@ -232,8 +237,7 @@ namespace render {
 		/*auto& light = _ligth_images.at(index);
 		glDeleteTextures(1,&std::get<2>(light));
 		glDeleteTextures(1,&std::get<3>(light));*/
-
-		_ligth_images.erase(_ligth_images.begin()+index);
+		if(index != -1)	_ligth_images.erase(_ligth_images.begin()+index);
 	}
 
 	void render_engine::add_light(unsigned int size, glm::vec2 position, glm::vec4 color) {
@@ -349,7 +353,7 @@ namespace render {
 
 		auto pic = add_image(ligthsize,ligthsize,false);
 
-		_ligth_images.emplace_back(std::get<0>(pic),std::get<1>(pic),oclusion_texture,shadow1D_texture,glm::vec3{pos.x-(ligthsize/2),pos.y-(ligthsize/2),0},color,glm::vec2(size,size));
+		_ligth_images.emplace_back(std::get<0>(pic),std::get<1>(pic),oclusion_texture,shadow1D_texture,glm::vec3{pos.x-(ligthsize/2.f),pos.y-(ligthsize/2.f),0},color,glm::vec2(size,size));
 	}
 
 	void render_engine::framebuffer_check(GLenum result) const {
