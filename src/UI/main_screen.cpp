@@ -74,34 +74,78 @@ namespace ui {
 		auto result = Widget::mouseButtonEvent(p, button, down, modifiers);
 
 		if(!result) {
-			if (down) {
-				for (int i = 0; i < _render_engine->light_count(); ++i) {
-					auto light_pos = _render_engine->light_pos(i);
-					auto distance = glm::distance(light_pos, {p.x(), height - p.y()});
-					if (distance < select_size) {
-						selected = i;
-					}
+			if (down && button == 0) {
+				move = true;
+				if(selected == -1){
+					_color_default = _color;
+					size_default = size;
+				} else{
+					_render_engine->light_deselect(selected);
 				}
+				selected = select_light({p.x(), height - p.y()});
 				if (selected == -1) {
 					_render_engine->add_light(unsigned(size), {p.x(), height - p.y()},_color);
+					selected = _render_engine->light_count()-1;
+					if(hover_selected != -1){
+						_render_engine->light_deselect(hover_selected);
+					}
 				}
-			} else {
+				_render_engine->light_select(selected);
+
+				_ligth_delet_button->setEnabled(true);
+				auto color = _render_engine->light_color(selected);
+				_ligth_color_wheel->setColor({color.r, color.g, color.b, color.a});
+				_ligth_size_slider->setValue(_render_engine->light_size(selected) / 1024);
+
+			}else if(down && button == 1){
+				if(selected != -1)	_render_engine->light_deselect(selected);
 				selected = -1;
+				_ligth_delet_button->setEnabled(false);
+				_color=_color_default;
+				size=size_default;
+				_ligth_color_wheel->setColor({_color.r, _color.g, _color.b, _color.a});
+				_ligth_size_slider->setValue(size / 1024);
+			} else{
+				move = false;
 			}
-
 		}
-
 		return result;
+	}
+
+	int main_screen::select_light(glm::vec2 pos){
+		for (int i = 0; i < _render_engine->light_count(); ++i) {
+			auto light_pos = _render_engine->light_pos(i);
+			auto distance = glm::distance(light_pos, pos);
+			if (distance < select_size) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 
 	bool main_screen::mouseMotionEvent(const Eigen::Vector2i &p, const Eigen::Vector2i &rel, int button,
 									   int modifiers) {
 
-		if(selected != -1) {
-			_render_engine->move_light(selected, glm::vec2(p.x(), height - p.y()));
+		auto result = Widget::mouseMotionEvent(p, rel, button, modifiers);
+		if(!result) {
+			if (move && selected != -1) {
+				_render_engine->move_light(selected, glm::vec2(p.x(), height - p.y()));
+				//hover_selected = selected;
+			} else {
+				for (int i = 0; i < _render_engine->light_count(); ++i) {
+					if(selected == i) continue;
+					_render_engine->light_deselect(i);
+				}
+
+				auto sel = select_light({p.x(), height - p.y()});
+				hover_selected = sel;
+				if (hover_selected != -1) {
+					_render_engine->light_select(hover_selected);
+				}
+			}
 		}
 
-		return Widget::mouseMotionEvent(p, rel, button, modifiers);
+		return result;
 	}
 }

@@ -28,42 +28,75 @@ namespace ui {
 		std::unique_ptr<render::render_engine> _render_engine;
 		static int select_size;
 		int selected;
+		int hover_selected;
 		glm::vec4 _color;
 		float size;
+		bool move;
+		nanogui::Slider *_ligth_size_slider;
+		nanogui::ColorWheel *_ligth_color_wheel;
+		nanogui::Button *_ligth_delet_button;
+
+		glm::vec4 _color_default;
+		float size_default;
 
 	public:
 		static int width;
 		static int height;
 
-		main_screen(Eigen::Vector2i res, std::string s) : nanogui::Screen(res, s),selected(-1),_color(1),size(256) {
+		main_screen(Eigen::Vector2i res, std::string s) :
+				nanogui::Screen(res, s),
+				selected(-1),
+				hover_selected(-1),
+				_color(1),
+				size(256),
+				_color_default(1),
+				size_default(256),
+				move(false),
+				_ligth_size_slider(nullptr),
+				_ligth_color_wheel(nullptr),
+				_ligth_delet_button(nullptr){
 			using namespace nanogui;
 
 			main_screen::width = res[0];
 			main_screen::height = res[1];
 
-			auto *window = new Window(this, "Button demo");
+			auto *window = new Window(this, "Light Control");
 			window->setLayout(new GroupLayout());
 			window->setPosition(Vector2i(150, 150));
 			window->setFixedSize(Vector2i(400, 350));
 
-			new Label(window, "Push buttons", "sans-bold");
+			//new Label(window, "Push buttons", "sans-bold");
 
-			/*Button *b = new Button(window, "Plain button");
-			b->setCallback([] { std::cout << "pushed!" << std::endl; });
-			b = new Button(window, "Styled", ENTYPO_ICON_ROCKET);
-			b->setBackgroundColor(Color(0, 0, 255, 25));
-			b->setCallback([] { std::cout << "pushed!" << std::endl; });*/
+			_ligth_delet_button = new Button(window, "Remove");
+			_ligth_delet_button->setCallback([&] { if(selected != -1 ) {
+				_render_engine->remove_light(selected);
+				_ligth_delet_button->setEnabled(false);
+				_ligth_color_wheel->setColor({_color_default.r, _color_default.g, _color_default.b, _color_default.a});
+				_ligth_size_slider->setValue(size_default / 1024);
+				selected = -1;
+			}});
 
-			ColorWheel *cw = new ColorWheel(window);
-			cw->setColor({_color.r,_color.g,_color.b,_color.a});
-			cw->setCallback([this](const Color &value){
+			new Label(window,"Ligth color:");
+			_ligth_color_wheel = new ColorWheel(window);
+			_ligth_color_wheel->setColor({_color.r, _color.g, _color.b, _color.a});
+			_ligth_color_wheel->setCallback([&](const Color &value){
 				_color = glm::vec4{value.r(),value.g(),value.b(),1.f};
+				if(selected!=-1){
+					_render_engine->light_color(selected,_color);
+				}
 			});
 
-			Slider *_slider = new Slider(window);
-			_slider->setValue(size/1024);
-			_slider->setCallback([this](const float& value){
-				size = value*1024;
+			new Label(window,"Ligth size:");
+			_ligth_size_slider = new Slider(window);
+			_ligth_size_slider->setValue(size / 1024);
+			_ligth_size_slider->setCallback([&](const float& value){
+				size = glm::max(value*1024,1.f);
+				if(selected!=-1){
+					auto pos = _render_engine->light_pos(selected);
+					_render_engine->remove_light(selected);
+					_render_engine->add_light(unsigned(size), pos,_color);
+					selected = _render_engine->light_count()-1;
+				}
 			});
 
 			performLayout(mNVGContext);
@@ -109,7 +142,7 @@ namespace ui {
 
 			_render_engine->window_resize(res[0],res[1]);
 			_render_engine->add_image("textures/cat4.png", 2);
-			_render_engine->add_light(256*4,{400,400});
+			//_render_engine->add_light(256*4,{400,400});
 
 		}
 		~main_screen(){
@@ -137,6 +170,8 @@ namespace ui {
 
 		virtual bool mouseMotionEvent(const Eigen::Vector2i &p, const Eigen::Vector2i &rel, int button,
 									  int modifiers) override;
+
+		int select_light(glm::vec2 pos);
 	};
 }
 

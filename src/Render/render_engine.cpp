@@ -19,7 +19,6 @@ namespace render {
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}
 
-
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 		//glBlendFunc(GL_ONE, GL_ONE);
@@ -27,19 +26,30 @@ namespace render {
 		matrix_id = _shadow_render_shader->getUniform("MVP");
 		auto color_id =  _shadow_render_shader->getUniform("Color");
 		auto res_id =  _shadow_render_shader->getUniform("light_resolution");
+		auto selected_id =  _shadow_render_shader->getUniform("selected");
+		auto blur_factor_id =  _shadow_render_shader->getUniform("blur_factor");
+		glUniform1f(blur_factor_id,global_blur_factor);
+
 
 		for(auto& img : _ligth_images){
-			glBindVertexArray(std::get<0>(img));
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, std::get<1>(img));
+			glBindVertexArray(img.vao);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, img.ibo);
 
-			glBindTexture(GL_TEXTURE_2D, std::get<3>(img));
-			glm::mat4 mvp = glm::translate(_mvp,std::get<4>(img));
-			glUniform4fv(color_id,1,&std::get<5>(img)[0]);
-			glUniform2fv(res_id,1,&std::get<6>(img)[0]);
+			glBindTexture(GL_TEXTURE_2D, img.shadowmap_texture);
+			glm::mat4 mvp = glm::translate(_mvp,img.position);
+			glUniform4fv(color_id,1,&img.color[0]);
+			glUniform1f(selected_id,img.selceted);
+			glUniform2fv(res_id,1,&img.size[0]);
 			glUniformMatrix4fv(matrix_id, 1, GL_FALSE, &mvp[0][0]);
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		auto error = glGetError();
+
+		if(error != GL_NO_ERROR){
+			//std::cerr << "this shouldn't happend" << std::endl;
+		}
 
 		_basicshader->use_shader();
 		matrix_id = _basicshader->getUniform("MVP");
@@ -170,10 +180,10 @@ namespace render {
 		glDepthMask(GL_FALSE);
 		auto& ligth = _ligth_images.at(index);
 
-		auto& oclusion_texture = std::get<2>(ligth);
-		auto& shadow1D_texture = std::get<3>(ligth);
-		auto& size = std::get<6>(ligth);
-		std::get<4>(ligth) = glm::vec3{position.x-(size.x/2),position.y-(size.y/2),0};//glm::vec3{position.x,position.y,0};
+		auto& oclusion_texture = ligth.ocluder_texture;
+		auto& shadow1D_texture = ligth.shadowmap_texture;
+		auto& size = ligth.size;
+		ligth.position = glm::vec3{position.x-(size.x/2),position.y-(size.y/2),0};//glm::vec3{position.x,position.y,0};
 
 		glBindFramebuffer(GL_FRAMEBUFFER,oclusion_fbo);
 		glBindTexture(GL_TEXTURE_2D, oclusion_texture);
@@ -224,11 +234,10 @@ namespace render {
 	}
 
 	void render_engine::remove_light(int index){
-		auto& light = _ligth_images.at(index);
+		/*auto& light = _ligth_images.at(index);
 		glDeleteTextures(1,&std::get<2>(light));
-		glDeleteTextures(1,&std::get<3>(light));
-
-		_ligth_images.erase(_ligth_images.begin()+index);
+		glDeleteTextures(1,&std::get<3>(light));*/
+		if(index != -1)	_ligth_images.erase(_ligth_images.begin()+index);
 	}
 
 	void render_engine::add_light(unsigned int size, glm::vec2 position, glm::vec4 color) {
@@ -344,7 +353,7 @@ namespace render {
 
 		auto pic = add_image(ligthsize,ligthsize,false);
 
-		_ligth_images.emplace_back(std::get<0>(pic),std::get<1>(pic),oclusion_texture,shadow1D_texture,glm::vec3{pos.x-(ligthsize/2),pos.y-(ligthsize/2),0},color,glm::vec2(size,size));
+		_ligth_images.emplace_back(std::get<0>(pic),std::get<1>(pic),oclusion_texture,shadow1D_texture,glm::vec3{pos.x-(ligthsize/2.f),pos.y-(ligthsize/2.f),0},color,glm::vec2(size,size));
 	}
 
 	void render_engine::framebuffer_check(GLenum result) const {

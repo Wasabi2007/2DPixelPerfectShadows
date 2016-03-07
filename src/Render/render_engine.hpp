@@ -12,8 +12,75 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <memory>
+#include <iomanip>
+#include <utility>
 
 namespace render {
+	struct light{
+		GLuint vao;
+		GLuint ibo;
+		GLuint ocluder_texture;
+		GLuint shadowmap_texture;
+		glm::vec3 position;
+		glm::vec4 color;
+		glm::vec2 size;
+
+		float selceted;
+		float blur_factor;
+
+		bool _owner;
+
+		light() = delete;
+		light(light& l) = delete;
+
+		light(light&& l):
+				vao(std::move(l.vao)),
+				ibo(std::move(l.ibo)),
+				ocluder_texture(std::move(l.ocluder_texture)),
+				shadowmap_texture(std::move(l.shadowmap_texture)),
+				position(std::move(l.position)),
+				color(std::move(l.color)),
+				size(std::move(l.size)),
+				selceted(std::move(l.selceted)),
+				blur_factor(std::move(l.blur_factor)),
+				_owner(true)
+		{
+			l._owner = false;
+		}
+		light& operator=(const light& l) = delete;
+		light& operator=(light&& l){
+			l._owner = false;
+			vao = std::move(l.vao);
+			ibo = std::move(l.ibo);
+			ocluder_texture = std::move(l.ocluder_texture);
+			shadowmap_texture = std::move(l.shadowmap_texture);
+			position = std::move(l.position);
+			color = std::move(l.color);
+			size = std::move(l.size);
+			selceted = std::move(l.selceted);
+			blur_factor = std::move(l.blur_factor);
+			_owner = true;
+		}
+
+		light(const GLuint vao, const GLuint ibo, const GLuint ocluder_texture, const GLuint shadowmap_texture,
+			  const glm::vec3 &position, const glm::vec4 &color, const glm::vec2 &size) : vao(vao), ibo(ibo),
+																						  ocluder_texture(
+																								  ocluder_texture),
+																						  shadowmap_texture(
+																								  shadowmap_texture),
+																						  position(position),
+																						  color(color),_owner(true), size(size),selceted(0),blur_factor(0) { }
+
+		~light() {
+			if (_owner) {
+				glDeleteVertexArrays(1,&vao);
+				glDeleteBuffers(1,&ibo);
+				glDeleteTextures(1,&ocluder_texture);
+				glDeleteTextures(1,&shadowmap_texture);
+			}
+		}
+
+	};
 	class render_engine {
 	private:
 		std::unique_ptr<shader> _basicshader;
@@ -21,7 +88,7 @@ namespace render {
 		std::unique_ptr<shader> _shadow_render_shader;
 		std::vector<std::tuple<GLuint,GLuint,texture>> _ocluder_images; //VAO, IBO, Texture
 		std::vector<std::tuple<GLuint,GLuint,texture>> _background_images; //VAO, IBO, Texture
-		std::vector<std::tuple<GLuint,GLuint,GLuint,GLuint,glm::vec3,glm::vec4,glm::vec2>> _ligth_images; //VAO, IBO, Ocluder_Texture, 1DShadowmap, Position, Color, Size
+		std::vector<light> _ligth_images; //VAO, IBO, Ocluder_Texture, 1DShadowmap, Position, Color, Size
 		glm::mat4 _mvp;
 		GLuint oclusion_fbo;
 		GLuint shadow1D_fbo;
@@ -29,8 +96,10 @@ namespace render {
 		GLuint quad_VertexArrayID;
 		GLuint depth_rb;
 
+		float global_blur_factor;
+
 	public:
-		render_engine(){
+		render_engine():global_blur_factor(0){
 			_basicshader = std::make_unique<shader>(shader{"shader/basic.vs", shader_type::Vertex},
 													shader{"shader/basic.fs",shader_type::Fragment},
 													std::vector<shader_attribute>{{1,"in_pos"},{2,"in_uv"}},
@@ -115,20 +184,39 @@ namespace render {
 
 		void move_light(int index,glm::vec2 position);
 
+		void light_color(int index, glm::vec4 color){
+			_ligth_images.at(index).color = color;
+		}
+		glm::vec4 light_color(int index){
+			return _ligth_images.at(index).color;
+		}
+		float light_size(int index){
+			return _ligth_images.at(index).size.x;
+		}
+
 		void framebuffer_check(GLenum result) const;
 
 		auto light_count() const {return _ligth_images.size();}
 
 		auto light_pos(int index){
-			auto& size = std::get<6>(_ligth_images.at(index));
-			auto& pos = std::get<4>(_ligth_images.at(index));
+			auto& size = _ligth_images.at(index).size;
+			auto& pos = _ligth_images.at(index).position;
 			return glm::vec2{pos.x + size.x/2, pos.y + size.y/2 };}
+
+		void light_select(int index){
+			_ligth_images.at(index).selceted = 1;
+		}
+		void light_deselect(int index){
+			_ligth_images.at(index).selceted = 0;
+		}
 
 		void remove_light(int index);
 
-		void add_background();
-
 		void add_background(std::string path, float scaling);
+
+		void toogle_blur(){
+			global_blur_factor = 1-global_blur_factor;
+		}
 	};
 }
 
