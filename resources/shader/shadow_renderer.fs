@@ -60,6 +60,6 @@ void main(void) {
     sum = (1-blur_factor)*sum + (blur_factor)*center;
 
     //multiply the summed amount by our distance, which gives us a radial falloff
-    //then multiply by vertex (light) color
+    //then multiply by (light) color
     out_color = Color * vec4(vec3(1.0), sum * ((1-selected)*smoothstep(1.0, 0.0, r)+(selected)));
 }

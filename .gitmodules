@@ -12,4 +12,4 @@
 	url = git@github.com:lvandeve/lodepng.git
 [submodule "libs/nanogui"]
 	path = libs/nanogui
-	url = git@github.com:wjakob/nanogui.git
+	url = git@github.com:Wasabi2007/nanogui.git
