@@ -16,6 +16,8 @@
 #include <utility>
 
 namespace render {
+
+	//struct to manage every relevant resource for the ligths
 	struct light{
 		GLuint vao;
 		GLuint ibo;

@@ -10,6 +10,7 @@
 
 namespace render {
 
+	// simple stuct to save relevant mesh data.
 	struct model{
 		std::vector<float> data;
 

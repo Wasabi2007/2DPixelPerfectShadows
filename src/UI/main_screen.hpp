@@ -142,7 +142,6 @@ namespace ui {
 
 			_render_engine->window_resize(res[0],res[1]);
 			_render_engine->add_image("textures/test.png", 2);
-			//_render_engine->add_light(256*4,{400,400});
 
 		}
 		~main_screen(){

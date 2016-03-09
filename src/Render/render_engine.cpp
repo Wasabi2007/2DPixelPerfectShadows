@@ -7,6 +7,8 @@
 
 namespace render {
 	void render_engine::render(){
+
+		//First we render everything that should be in the Background
 		_basicshader->use_shader();
 		GLint matrix_id = _basicshader->getUniform("MVP");
 		glUniformMatrix4fv(matrix_id, 1, GL_FALSE, &_mvp[0][0]);
@@ -19,9 +21,10 @@ namespace render {
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}
 
+
+		//Render every ligth that is queued
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-		//glBlendFunc(GL_ONE, GL_ONE);
 		_shadow_render_shader->use_shader();
 		matrix_id = _shadow_render_shader->getUniform("MVP");
 		auto color_id =  _shadow_render_shader->getUniform("Color");
@@ -51,6 +54,7 @@ namespace render {
 			//std::cerr << "this shouldn't happend" << std::endl;
 		}
 
+		//Render everything that blocks Light.
 		_basicshader->use_shader();
 		matrix_id = _basicshader->getUniform("MVP");
 		glUniformMatrix4fv(matrix_id, 1, GL_FALSE, &_mvp[0][0]);
@@ -74,8 +78,8 @@ namespace render {
 		_background_images.emplace_back(std::move(image_tupel));
 	}
 
+	//render what the light "sees"
 	void render_engine::render_ocluders(glm::mat4 &mvp) {
-
 		_basicshader->use_shader();
 		GLint matrix_id = _basicshader->getUniform("MVP");
 		glUniformMatrix4fv(matrix_id, 1, GL_FALSE, &mvp[0][0]);
@@ -98,7 +102,7 @@ namespace render {
 		glBindVertexArray(VertexArrayID);
 
 
-		// An array of 3 vectors which represents 3 vertices
+		//A Simple quad for the image.
 		const GLfloat g_vertex_buffer_data[] = {
 				0.0f, 0.0f, 0.0f,//Position
 				(flipu?1.f:0.f), 0.0f, //UV
@@ -176,6 +180,7 @@ namespace render {
 	}
 
 	void render_engine::move_light(int index,glm::vec2 position){
+		//rerender the shadow map for the moved ligth
 		glDisable(GL_DEPTH_TEST);
 		glDepthMask(GL_FALSE);
 		auto& ligth = _ligth_images.at(index);
@@ -234,9 +239,6 @@ namespace render {
 	}
 
 	void render_engine::remove_light(int index){
-		/*auto& light = _ligth_images.at(index);
-		glDeleteTextures(1,&std::get<2>(light));
-		glDeleteTextures(1,&std::get<3>(light));*/
 		if(index != -1)	_ligth_images.erase(_ligth_images.begin()+index);
 	}
 
@@ -264,20 +266,8 @@ namespace render {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-		// Poor filtering. Needed !
-		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
 		// Set "oclusion_texture" as our colour attachement #0
-		//glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, 0, 0);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, oclusion_texture, 0);
-
-		//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_rb);
-
-
-		//glBindFramebuffer(GL_FRAMEBUFFER,oclusion_fbo);
-		// Set the list of draw buffers.
-
 
 		// Always check that our framebuffer is ok
 		auto result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -312,18 +302,11 @@ namespace render {
 		// Poor filtering. Needed !
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); //set to repeat so we can oversample the circle
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-		// Set "oclusion_texture" as our colour attachement #0
-		//glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, 0, 0);
 
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, shadow1D_texture, 0);
-		//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_rb);
-		//glBindFramebuffer(GL_FRAMEBUFFER,shadow1D_fbo);
-		// Set the list of draw buffers.
-		//GLenum Draw_Buffers[1] = {GL_COLOR_ATTACHMENT0};
-		//glDrawBuffers(1, Draw_Buffers); // "1" is the size of DrawBuffers
 
 		// Always check that our framebuffer is ok
 		result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
