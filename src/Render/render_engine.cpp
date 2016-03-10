@@ -299,7 +299,6 @@ namespace render {
 		// Give an empty image to OpenGL ( the last "0" )
 		glTexImage2D(GL_TEXTURE_2D, 0,GL_RGBA8, ligthsize,1, 0,GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
-		// Poor filtering. Needed !
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); //set to repeat so we can oversample the circle

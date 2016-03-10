@@ -14,7 +14,6 @@ out vec4 out_color;
 
 void main(){
 	float distance = 1.0;
-	vec4 debug_data;
 
 	for (float y=0.0; y<light_resolution.y; y+=1.0) {
 		//rectangular to polar filter
@@ -22,15 +21,11 @@ void main(){
 		float theta = PI*1.5 + norm.x * PI;
 		float r = (1.0 + norm.y) * 0.5;
 
-		//coord which we will sample from occlude map
+		//Coordinat which we will sample from occlude map
         vec2 coord = vec2(-r * sin(theta), -r * cos(theta))/2.0 + 0.5;
 
 		//sample the occlusion map
 		vec4 data = texture2D(ocluder_texture, coord);
-
-		if(abs(y-0) < 0.0001){
-		 debug_data = data;
-		}
 
         //the current distance is how far from the top we've come
         float dst = y/light_resolution.y;
@@ -42,7 +37,6 @@ void main(){
 
 		if (caster > ALPHA_THRESHOLD) {
 			distance = min(distance, dst);
-			//NOTE: we could probably use "break" or "return" here
 		}
 	}
 	out_color=vec4(vec3(distance), 1.0);

@@ -10,7 +10,7 @@ uniform sampler2D shadow_map_texture;
 uniform vec2 light_resolution;
 uniform vec4 Color;
 
-//usability stuff
+//variable to signal if this light is selected and how much blur it should have
 uniform float selected;
 uniform float blur_factor;
 
