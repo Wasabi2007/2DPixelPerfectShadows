@@ -3,23 +3,23 @@ A Project for implementing 2D Shadow in OpenGL and C++
 
 ## Installation
 
-Git Clone this Project.
-Then update the checkout the submodules.
-This comand shoudl help:
-    git submodule update --recursive
-Run Cmake.
-Run Make.
-Run The Program.
-Have fun :)
+Git Clone this Project.  
+Then update the checkout the submodules.  
+This comand shoudl help:  
+	git submodule update --recursive  
+Run Cmake.  
+Run Make.  
+Run The Program.  
+Have fun :)  
 
 ## Usage
 
-With left click you can create light sources.
-If there is already a light source it will be highlighted for selection.
+With left click you can create light sources.  
+If there is already a light source it will be highlighted for selection.  
 With pressed left click you can move the light around. 
-To deselect simply use right click.
-
-There is also a Simple Toolbox to modify a selected light or to change the default settings.
+To deselect simply use right click.  
+  
+There is also a Simple Toolbox to modify a selected light or to change the default settings.  
 
 ## Credits
 
