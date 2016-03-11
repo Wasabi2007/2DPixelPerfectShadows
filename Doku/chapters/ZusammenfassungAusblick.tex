@@ -1,3 +1,12 @@
 \chapter{Zusammenfassung und Ausblick}
-
-In diesem Kapitel soll die Arbeit noch einmal kurz zusammengefasst werden. Insbesondere sollen die wesentlichen Ergebnisse Ihrer Arbeit herausgehoben werden. Erfahrungen, die z.B. Benutzer mit der Mensch-Maschine-Schnittstelle gemacht haben oder Ergebnisse von Leistungsmessungen sollen an dieser Stelle präsentiert werden. Sie können in diesem Kapitel auch die Ergebnisse oder das Arbeitsumfeld Ihrer Arbeit kritisch bewerten. Wünschenswerte Erweiterungen sollen als Hinweise auf weiterführende Arbeiten erwähnt werden.
+In dem Projekt wurde erfolgreich das Verfahren zur 2D Schattenberechnung umgesetzt.
+Bei der Umsetzung war vor allem das arbeiten mit Framebuffern eine neue Erfahrung.
+Die aktuelle Implementierung sehr rudimentäre und enthält nur die reine Schatten Berechnung.
+Gute Erweiterungen wären zum Beispiel Unterstützung für Normalen und eine Schattierung der Occluder.
+Verbesserungsmöglichkeiten Beständen auch zusätzlich im Bereich des Rendering, in der aktuellen Version wird für jedes Licht ein eigenes Mesh erzeugt und separat gerendert. Was zu einer extrem hohen Pixelfüllrate bei vielen Lichtern führt.
+Die Speicherung der 1D Texturen könnte auch noch durch Atlase verbessert werden.\\
+In der Zukunft würde ich die umgesetzte Technik gerne noch weiter ausbauen und verbessern.
+Ziel ist es die Technik soweit zu entwickeln das sie in 2D Spielen eingesetzt werden kann.
+//
+//
+Abschließend noch vielen dank an Matt DesLauriers. Diese Implementierung basiert stark auf seiner Arbeit auf github.\cite{mattdesl:13} 

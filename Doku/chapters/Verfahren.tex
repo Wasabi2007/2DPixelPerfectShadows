@@ -1,30 +1,32 @@
 \chapter{Verfahren}
-Das Verfahren besteht grundsätzlich aus 3 Schritten.
+Das Verfahren zur Schattenberechnung besteht grundsätzlich aus 3 Schritten.
+Die Verwendete Methodik ist ein Raycastverfahren das durch einige Mathematische Umformungen der Texturen den Raycast stark vereinfacht.
 \section{Oclussionmap}
-Zur Licht Berechnung wird zuerst eine Occlusionmap erstellt \ref{o_1}. Diese Textur Bildet ab was das licht vom Level sieht.\ref{level_1}
+Zur Licht Berechnung muss zuerst eine Occlusionmap erstellt \ref{o_1}. Diese Textur Bildet ab welchen Bereich das Licht vom Level abdeckt.\ref{level_1}
 \begin{figure}
 	\centering
 	\includegraphics[scale=0.5]{images/test.png}
 	\caption{Testgrafik}
 	\label{level_1}
 \end{figure}
+\\
 \begin{figure}
 	\centering
 	\includegraphics{images/oclusion.png}
-	\caption{Oclussionmap}
+	\caption{Occlussionmap}
 	\label{o_1}
 \end{figure}
-
+\\
 
 \section{Sample Distanz}
-Die Oclusionmap wird zur besseren Parallelisierbarkeit in Polarkoordinaten gesampelt.\ref{o_2}
+Die Occlusionmap wird zur besseren Parallelisierbarkeit in Polarkoordinaten gesampelt.\ref{o_2}\\
 \begin{figure}
 	\centering
 	\includegraphics{images/oclusion_polar_2.png}
 	\caption{Oclussionmap in polar Koordinaten}
 	\label{o_2}
 \end{figure}
-Nun wird einfach die Distanz für jedes X gemessen bis es auf ein blockierenden Pixel stößt. \ref{o_3}
+ So können wir einen Raycast für $360°$ um die Lichtquelle auf der X Achse parallelisieren. Hier wird nun für jedes $X$ eine Distanz bis zum ersten blockierenden Pixel gemessen.\ref{o_3}
 \begin{figure}
 	\centering
 	\includegraphics{images/shadow_polar_2.png}
@@ -39,7 +41,7 @@ Die gemessene Distanz wird in einer 1D Textur zur weiter Verarbeitung Gespeicher
 	\label{o_4}
 \end{figure}
 \section{Render Licht}
-Im letzten Schritt wird ein Sprite in der Größe des lichtes gerendert. Durch Verwendung einer Stepfunktion wird die Distanz zum mittel Punkt mit der maximal Entfernung die in der Textur gespeichert wurde verglichen.
+Im letzten Schritt wird ein Sprite in der Größe des Lichtes gerendert. Durch Verwendung einer Stepfunktion wird die Distanz zum mittel Punkt mit der maximal Entfernung die in der Textur gespeichert wurde verglichen. Wenn der gesampelte Punkt weiter weg ist als die Gemessene Entfernung liegt der Pixel im Schatten und wird schwarz gezeichnet.
 Anschließend muss das Sprite nur noch additiv Geblendet gerendert werden.\ref{level_licht_1}
 \begin{figure}
 	\centering

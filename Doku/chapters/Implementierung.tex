@@ -1,7 +1,7 @@
 \chapter{Implementierung}
 Das Verfahren wurde im Rahmen des Projektes in einen OpenGl C++ Programm umgesetzt.
 Um die 2D Schatten zu implementieren müssen zwingend Framebuffer benutzt werden.
-Den ohne können die entsprechenden Texturen nicht erstellt werden die zu Berechnung der Schatten benötigt werden. 
+Ohne Verwendung von Framebuffern können die entsprechenden Texturen nicht erstellt werden die zu Berechnung der Schatten benötigt werden. 
 \begin{figure}
 	\centering
 	\includegraphics[scale=0.25]{images/Bildschirmfoto_1.png}
@@ -9,7 +9,7 @@ Den ohne können die entsprechenden Texturen nicht erstellt werden die zu Berech
 	\label{p_1}
 \end{figure}
 
-Die Schritte die hier beschrieben werden müssen für jedes Licht durchgeführt werden.
+Die Schritte die hier beschrieben werden müssen für jedes neue Licht durchgeführt werden.
 
 \section{Oclussionmap}
 
@@ -36,7 +36,7 @@ glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
 					 oclusion_texture, 0);
 \end{lstlisting}
 
-Jetzt müssen die Occluder nur noch entsprechen transformiert gerendert werden.
+Jetzt werden die Occluder mit der entsprechen Transformierung gerendert um den vom Licht abgedeckten Bereich zu erfassen.
 \begin{lstlisting}
 auto mvp = glm::mat4{1};
 auto ligthsize_half = (ligthsize/2.f);
@@ -91,7 +91,7 @@ glDrawArrays(GL_TRIANGLES,0,6);
 
 \paragraph{Shader}
 Der Shader\ref{shadow_shader} bekommt die Informationen wie groß die Occlusiontextur ist.
-Da dieser Shader auf einem Mesh ausgeführt wird der nur einen einen Pixel hoch ist, wird jeder Punkt auf der Occlusiontextur einmal gesampelt und die Tiefen Information in der Textur als Grauwert gespeichert.
+Da dieser Shader auf einem Mesh ausgeführt wird der nur einen einen Pixel hoch ist, wird jeder Punkt auf der Occlusiontextur exakt nur einmal gesampelt und die Tiefen Information in der 1D Textur als Grauwert gespeichert.
 
 \begin{lstlisting}[caption=Shadowmaper Shader,label=shadow_shader]
 #version 330
@@ -139,7 +139,7 @@ out_color=vec4(vec3(distance), 1.0);
 }
 \end{lstlisting}
 
-Abschließend wird die 1D Textur mit noch ein paar weiteren Informationen in einem Vector abgelegt und später grendert zu werden.
+Abschließend wird die 1D Textur mit noch ein paar weiteren Informationen in einem \textit{Vector} abgelegt um später grendert zu werden.
 
 \begin{lstlisting}
 auto pic = add_image(ligthsize,ligthsize,false);
@@ -152,7 +152,7 @@ _ligth_images.emplace_back(std::get<0>(pic),std::get<1>(pic)
 \end{lstlisting}
 
 \section{Finales Rendering}
-Letztendlich werden nur noch die Distanz Informationen aus der 1D Textur gelesen und zu Licht mit einem Falloff grendert. Für die bessere Optik wurde noch ein Gausfilter, in der stärke abhängig von der Entfernung zur Quelle, angewendet.
+Beim Rendern der Schatten wird letztendlich nur noch die Distanz Informationen aus der 1D Textur gelesen und als Licht mit einem Falloff grendert. Für die bessere Optik wurde noch ein Gausfilter, in der stärke abhängig von der Entfernung zur Quelle, angewendet.
 
  \begin{lstlisting}[caption=Shadow Render Shader,label=shadow_render_shader]
 #version 330
