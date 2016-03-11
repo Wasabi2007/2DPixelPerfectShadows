@@ -6,7 +6,7 @@ A Project for implementing 2D Shadow in OpenGL and C++
 Git Clone this Project.  
 Then update the checkout the submodules.  
 This comand shoudl help:  
-	git submodule update --recursive  
+`git submodule update --recursive`   
 Run Cmake.  
 Run Make.  
 Run The Program.  
