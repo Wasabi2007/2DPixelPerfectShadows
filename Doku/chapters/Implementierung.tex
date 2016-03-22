@@ -5,7 +5,7 @@ Ohne Verwendung von Framebuffern können die entsprechenden Texturen nicht erste
 \begin{figure}[h]
 	\centering
 	\includegraphics[scale=0.25]{images/Bildschirmfoto_1.png}
-	\caption{Programm beim nach dem Start.}
+	\caption{Programm nach dem Start.}
 	\label{p_1}
 \end{figure}
 
@@ -46,7 +46,7 @@ mvp *= glm::translate(glm::mat4{1},
 render_ocluders(mvp);
 \end{lstlisting}
 
-Dabei wird kein Spezieller Shader benutzt es ist nur wichtig das die Alphakanal Informationen vorhanden sind.
+Dabei wird kein Spezieller Shader benutzt es ist nur wichtig, dass die Alphakanalinformationen vorhanden sind.
 
 \section{Shadowmap}
 Um die 1D Shadowmap zu erzeugen wird ein neuer Framebuffer mit einer Textur erzeugt die nur 1 Pixelhoch ist.
@@ -89,12 +89,12 @@ glBindVertexArray(quad_VertexArrayID);
 glDrawArrays(GL_TRIANGLES,0,6);
 \end{lstlisting}
 
-\paragraph{Shader}
+\subsubsection{Shader}
 Der Shader\ref{shadow_shader} bekommt die Informationen wie groß die Occlusiontextur ist.
-Da dieser Shader auf einem Mesh ausgeführt wird der nur einen einen Pixel hoch ist, wird jeder Punkt auf der Occlusiontextur exakt nur einmal gesampelt und die Tiefen Information in der 1D Textur als Grauwert gespeichert.
+Da dieser Shader auf einem Mesh ausgeführt wird der nur einen einen Pixel hoch ist, wird jeder Punkt auf der Occlusiontextur exakt einmal gesampelt und die Tiefen Information in der 1D Textur als Grauwert gespeichert.
 
-Der Shader basiert auf dem Shader von Matt DesLauriers \footnote{\url{https://gist.github.com/mattdesl/5286905\#file-shadowmap-frag}}
-Der Shader wurde auf OpenGL 3.3 Modernisiert und PI etwas exakter gewählt.
+Der Fragment Shader basiert auf dem Shader Programm von Matt DesLauriers \footnote{\url{https://gist.github.com/mattdesl/5286905\#file-shadowmap-frag}}
+Dieser wurde auf OpenGL 3.3 Modernisiert und PI etwas exakter gewählt.
 \begin{lstlisting}[caption=Shadowmaper Shader,label=shadow_shader]
 #version 330
 
@@ -141,7 +141,7 @@ out_color=vec4(vec3(distance), 1.0);
 }
 \end{lstlisting}
 
-Abschließend wird die 1D Textur mit noch ein paar weiteren Informationen in einem \textit{Vector} abgelegt um später grendert zu werden, zum Beispiel Position Farbe und Größe.
+Abschließend wird die 1D Textur mit ein paar weiteren Informationen in einem \textit{Vector} abgelegt um später gerendert zu werden, zum Beispiel Position, Farbe und Größe.
 
 \begin{lstlisting}
 auto pic = add_image(ligthsize,ligthsize,false);
@@ -154,11 +154,10 @@ _ligth_images.emplace_back(std::get<0>(pic),std::get<1>(pic)
 \end{lstlisting}
 
 \section{Finales Rendering}
-Beim Rendern der Schatten wird letztendlich nur noch die Distanz Informationen aus der 1D Textur gelesen und als Licht mit einem Falloff grendert. Für die bessere Optik wurde noch ein Gausfilter, in der stärke abhängig von der Entfernung zur Quelle, angewendet.
+Beim Rendern der Schatten wird letztendlich nur noch die Distanz Informationen aus der 1D Textur gelesen und als Licht mit einem Falloff gerendert. Für die bessere Optik wurde noch ein Gausfilter, in der stärke abhängig von der Entfernung zur Quelle, angewendet.
 
-Der Shader basiert auf dem Shader von Matt DesLauriers \footnote{\url{https://gist.github.com/mattdesl/5286905\#file-shadowrender-frag}}
-Der Shader wurde auf OpenGL 3.3 Modernisiert und PI etwas exakter gewählt.
-Um bessere Kontrolle über die Farbe zu haben wurde das Vertex Colorattribut durch ein Uniform ersetzt. Zusätzlich wurden noch zwei Uniform variableren hinzugefügt um Kontrolle über den Falloff und Gaus-Blur zu haben.  
+Auch dieser Shader basiert auf einem von Matt DesLauriers \footnote{\url{https://gist.github.com/mattdesl/5286905\#file-shadowrender-frag}} und wurde modernisiert.
+Um bessere Kontrolle über die Farbe zu haben wurde das Vertex Colorattribut durch ein Uniform ersetzt. Zusätzlich wurden noch zwei Uniform variableren hinzugefügt um Kontrolle über den Falloff und Gauß-Blur zu haben.  
  \begin{lstlisting}[caption=Shadow Render Shader,label=shadow_render_shader]
 #version 330
 
