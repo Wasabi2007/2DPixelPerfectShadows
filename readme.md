@@ -15,7 +15,7 @@ Make a build folder.
 `mkdir build`   
 `cd build`   
 Run Cmake.  
-`cmake -G "Unix Makefiles" ..`  
+`cmake -DBUILD_SHARED_LIBS=OFF -G "Unix Makefiles" ..`  
 Run Make.  
 `make 2DShadows`  
 Run The Program.  
