@@ -11,8 +11,8 @@ endif()
 add_library(lodepng libs/lodepng/lodepng.h libs/lodepng/lodepng.cpp libs/lodepng/lodepng_util.h libs/lodepng/lodepng_util.cpp)
 
 
+include_directories(libs/nanogui/ext/glfw/include)
 if(WIN32)
-    include_directories(libs/nanogui/ext/glfw/include)
     add_subdirectory(libs/nanogui/ext/glew)
 endif()
 
