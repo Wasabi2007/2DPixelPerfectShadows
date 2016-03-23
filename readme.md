@@ -1,14 +1,22 @@
 # 2D Shadows
 A Project for implementing 2D Shadow in OpenGL and C++
 
-## Installation
+## Build
+Dependencies:
+* cmake 3.2  
+* gcc 5.1.0 / clang 3.7.1
+* OpenGL 3.3
 
 Git Clone this Project.  
+`cd 2DPixelPerfectShadows`   
 Then update the checkout the submodules.  
-This comand should help:  
-`git submodule update --recursive`   
+`git submodule update --recursive` 
+Make a build folder.  
+`mkdir build`   
 Run Cmake.  
+`cmake -G "Unix Makefiles" ..`  
 Run Make.  
+`make 2DShadows`  
 Run The Program.  
 Have fun :)  
 
