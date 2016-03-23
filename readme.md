@@ -32,7 +32,7 @@ There is also a Simple Toolbox to modify a selected light or to change the defau
 
 ## Credits
 
-Thnks to [Matt DesLauriers](https://github.com/mattdesl "Matt DesLauriers") who has made
+Thanks to [Matt DesLauriers](https://github.com/mattdesl "Matt DesLauriers") who has made
 a great tutorial on which my program is heavily based on.
 https://github.com/mattdesl/lwjgl-basics/wiki/2D-Pixel-Perfect-Shadows
 
