@@ -6,7 +6,7 @@
 #define INC_2DSHADOWS_MAIN_SCREEN_HPP
 
 #include "../Render/render_engine.hpp"
-#include <GLFW/glfw3.h>
+#include <glfw/glfw3.h>
 #include <nanogui/screen.h>
 #include <nanogui/window.h>
 #include <nanogui/layout.h>
