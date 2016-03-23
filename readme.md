@@ -10,9 +10,10 @@ Dependencies:
 Git Clone this Project.  
 `cd 2DPixelPerfectShadows`   
 Then update the checkout the submodules.  
-`git submodule update --recursive`  
+`git submodule update --init --recursive`  
 Make a build folder.  
 `mkdir build`   
+`cd build`   
 Run Cmake.  
 `cmake -G "Unix Makefiles" ..`  
 Run Make.  
